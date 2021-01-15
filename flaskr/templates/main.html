@@ -1,0 +1,263 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Pool control</title>
+  <meta name="description" content="pool control">
+  <meta name="author" content="niklas">
+  <!--meta http-equiv="refresh" content="10"--> 
+
+  <!--link rel="stylesheet" href="css/styles.css?v=1.0"-->
+
+  <!--
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io();
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+    </script>
+  -->
+
+<style>
+
+    body {
+        background-color: #454545;
+        font-family: Verdana, sans-serif;
+        font-size: 44px;
+        color: #d3d3d3;
+    }
+
+    a:link, a:visited {
+        color: #8db1d1;
+        padding: 15px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border-radius: 30px;
+    }
+
+    a:hover, a:active {
+        background-color: #555555;
+    }
+
+    .page {
+        background-color: #353535;
+        width: 80%;
+        padding: 20px;
+        border-radius: 30px;
+        margin: 30px auto;
+    }
+
+    .box {
+        padding: 15px;
+        margin: 15px auto;
+        border-radius: 30px;
+        width: 90%;
+    }
+
+    .title {
+        background-color: #454545;
+        text-align: center;
+    }
+
+    .controls {
+        background-color: #454545;
+        font-size: 44px;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto;
+    }
+
+    .grid-item {
+        text-align: center;
+        margin: 10px;
+        border-radius: 15px;
+        border-width: 1px;
+    }
+
+    .grid-item .temps {
+        padding-top: 10%;
+    }
+
+    .grid-item p {
+        color: #aaaaaa;
+    }
+
+    .sensors_on {
+        background-color: #ca4020;
+    }
+
+    select {
+        background-color: #aaaaaa;
+        font-color: #353535;
+        border-width:0px;
+        border-radius: 10px;
+        font-size: 44px;
+    }
+
+    input {
+        font-size: 44px;
+        font-color: #353535;
+        width: 80px;
+        background-color: #aaaaaa;
+        border-width:0px;
+        border-radius: 10px;
+    }
+
+    input[type="number"] {
+        width: 80px;
+        background-color: #aaaaaa;
+        border-width:0px;
+        border-radius: 10px;
+    }
+
+    input.sensors_on {
+        background-color: #ca4020;
+    }
+
+    input.sensors_off {
+        background-color: #aaaaaa;
+    }
+
+
+    form label {
+        font-size: 44px;
+        padding: 15px;
+    }
+
+    .timer {
+        background-color: #454545;
+        padding-top: 35px;
+        padding-bottom: 35px;
+        text-align: center;
+    }
+
+    .timer_on {
+        background-color: #ca4020;
+    }
+
+    .timer_off {
+        background-color: #454545;
+    }
+
+    .toggle {
+        background-color: #356D29; /* Green */
+        width: 200px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 15px 32px;
+        margin: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 44px;
+        vertical-align: text-bottom;
+    }
+
+    .button_on {
+        background-color: #ca4020;
+    }
+    .button_off {
+        background-color: #356D29;
+    }
+
+</style>
+
+</head>
+
+<body>
+
+    <div class="page">
+
+    <div class="box title">
+        <a href="index"><h2>Badkontrollen</h2></a>
+    </div>
+
+    <div class="box controls">
+      <div class="grid-container">
+        <div class="grid-item">
+        <form action="/control/aux" method="post">
+            <button name="aux_" type="submit" class="toggle button_{{aux_status}}">
+                Ljus</button>
+        </form>
+        </div>
+
+        <div class="grid-item">
+            <p>Givare</p>
+        </div>
+
+        <div class="grid-item">
+            <p>Set points</p>
+        </div>
+
+        <div class="grid-item">
+            <form action="/control/pump" method="post">
+                <button name="pump_" type="submit" class="toggle button_{{pump_status}}">
+                    Pump</button>
+            </form>
+        </div>
+
+        <div class="grid-item">
+            <p>{{pump_temp}}</p>
+        </div>
+
+        <div class="grid-item {{sensors_status}}">
+            <form class="temps" id="pump-temp" action="/control/pump_temp" method="post">
+                <input class="{{sensors_status}}" id="pump_temp"  name="temp" type="number" min="0" step="1" value="{{set_pump_temp}}"/>
+                <input type="submit" value="OK"/>
+            </form>
+        </div>
+
+        <div class="grid-item">
+            <form action="/control/heat" method="post">
+                <button name="heat_" type="submit" class="toggle button_{{heat_status}}">
+                    V&auml;rme</button>
+            </form>
+        </div>
+
+        <div class="grid-item">
+            <p>{{pool_temp}}</p>
+        </div>
+
+        <div class="grid-item {{sensors_status}}">
+            <form class="temps" id="pool-temp" action="/control/pool_temp" method="post">
+                <input class="{{sensors_status}}" id="pool_temp" name="temp" type="number" min="0" max="39" step="1" value="{{set_pool_temp}}"/>
+                <input type="submit" value="OK"/>
+            </form>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="box timer {{timer_status}}" >
+        <form id="timer-control" action="/control/timer" method="post" value="{{interval}}">
+            <label for="timer_interval">Intervall:</label>
+            <select id="timer_interval" name="timer_interval">
+                {% for key,value in intervals.items() %}
+                <option value="{{key}}" {%if key == interval %} selected {% endif %}>{{value}}</option>
+                {% endfor %}
+            </select>
+
+            <label for="timer_duration">Tid:</label>
+            <select id="timer_duration" name="timer_duration" value="{{duration}}">
+                {% for key, value in durations.items() %}
+                <option value="{{key}}" {%if key == duration %} selected {% endif %}>{{value}}</option>
+                {% endfor %}
+            </select>
+
+            <input type="submit" name="submit" value="OK" />
+            <p style="font-size: 12px">Remaining {{timer_remain}}</p>
+        </form>
+    </div>
+
+    </div>
+
+</body>
+
