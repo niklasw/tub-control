@@ -5,6 +5,7 @@ import flaskr
 from sensors import TSensors, ds18b20
 import relay
 from relay.utils import *
+from flask_socketio import SocketIO, emit
 
 control = relay.init_controls()
 
@@ -45,7 +46,7 @@ def relay_toggle(action):
 
     if action == 'pump':
         control.buttons.pump()
-        control.timer.reset()
+        control.timer.stop()
         control.sensors.active = False
     elif action == 'aux':
         control.buttons.aux()

@@ -57,9 +57,10 @@ class Relay_control:
             Debug(self.timer)
             #if self.timer.active() and not self.heat_on:
             if self.timer.active:
-                if self.timer.on and not self.pump_on:
-                    self.buttons.pump()
-                    Debug(f'timer turns ON pump {self.timer.duration}')
+                if self.timer.on:
+                    if not self.pump_on:
+                        self.buttons.pump()
+                        Debug(f'timer turns ON pump {self.timer.duration}')
                 elif self.pump_on:
                     self.buttons.pump()
                     Debug(f'timer turns OFF pump {self.timer.duration}')

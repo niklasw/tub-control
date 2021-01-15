@@ -1,9 +1,11 @@
 appdirs==1.4.4
+bidict==0.21.2
 click==7.1.2
 distlib==0.3.1
 filelock==3.0.12
 Flask==1.1.2
 flask-htpasswd==0.4.0
+Flask-SocketIO==5.0.1
 importlib-metadata==2.1.1
 itsdangerous==1.1.0
 Jinja2==2.11.2
@@ -14,6 +16,8 @@ pkg-resources==0.0.0
 pluggy==0.13.1
 py==1.9.0
 pyparsing==2.4.7
+python-engineio==4.0.0
+python-socketio==5.0.4
 six==1.15.0
 smbus==1.1.post2
 toml==0.10.2
