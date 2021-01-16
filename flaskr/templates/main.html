@@ -84,8 +84,12 @@
         padding-top: 10%;
     }
 
-    .grid-item p {
+    p {
         color: #aaaaaa;
+    }
+
+    p.error {
+        color: red;
     }
 
     .sensors_on {
@@ -188,12 +192,12 @@
         </form>
         </div>
 
-        <div class="grid-item">
+        <div class="grid-item {{error_status}}">
             <p>Givare</p>
         </div>
 
         <div class="grid-item">
-            <p>Set points</p>
+            <p>B&ouml;rv&auml;rden</p>
         </div>
 
         <div class="grid-item">
@@ -203,7 +207,7 @@
             </form>
         </div>
 
-        <div class="grid-item">
+        <div class="grid-item {{error_status}}">
             <p>{{pump_temp}}</p>
         </div>
 
@@ -221,7 +225,7 @@
             </form>
         </div>
 
-        <div class="grid-item">
+        <div class="grid-item {{error_status}}">
             <p>{{pool_temp}}</p>
         </div>
 

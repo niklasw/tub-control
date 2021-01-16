@@ -3,7 +3,7 @@
 
 def init_controls():
     from relay.seeed_relay import Relay
-    from relay.buttons import Relay_control
+    from relay.control import Relay_control
     relay = Relay()
 
     control = Relay_control(relay)

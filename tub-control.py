@@ -11,11 +11,10 @@ control = relay.init_controls()
 
 app = flaskr.create_app()
 
-
 @app.route('/')
 @app.route('/index')
 def index():
-    control.get_status()
+    control.buttons.get_status()
 
     temps = control.sensors.values
 
@@ -23,10 +22,13 @@ def index():
     for thread in threading.enumerate():
         Debug(f'Thread running: {thread.name}')
 
+    error_status = 'error' if not control.sensors.ok else ''
+
     return render_template('main.html',
-                           aux_status='on' if control.aux_on else 'off',
-                           pump_status='on' if control.pump_on else 'off',
-                           heat_status='on' if control.heat_on else 'off',
+                           aux_status='on' if control.buttons.aux_on else 'off',
+                           pump_status='on' if control.buttons.pump_on else 'off',
+                           heat_status='on' if control.buttons.heat_on else 'off',
+                           error_status = error_status,
                            duration = control.timer.duration,
                            interval = control.timer.interval,
                            intervals = control.timer.intervals,
@@ -52,7 +54,7 @@ def relay_toggle(action):
         control.buttons.aux()
     elif action == 'heat':
         control.buttons.heat()
-        control.timer.reset()
+        control.timer.stop()
         control.sensors.active = False
     elif action == 'timer':
         interval = request.form['timer_interval']

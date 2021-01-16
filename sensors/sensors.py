@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import sys, time, threading
+from relay import utils
 
 class ds18b20:
     devices_path  = Path('/sys/bus/w1/devices')
@@ -29,13 +30,17 @@ class ds18b20:
     def read(self):
         import re
         lines = []
+        # Give it a few tries
         for i in range(10):
-            with open(self.data_file,'r') as fp:
-                lines = fp.readlines()
-                read_ok = lines and lines[0].strip()[-3:] == 'YES'
-                if read_ok:
-                    break
-                time.sleep(0.1)
+            try:
+                with self.data_file.open('r') as fp:
+                    lines = fp.readlines()
+                    read_ok = lines and lines[0].strip()[-3:] == 'YES'
+                    if read_ok:
+                        break
+                    time.sleep(0.1)
+            except:
+                Info('device read problem, retrying')
         pat1 = re.compile('.*\st=(-?[0-9]+)')
 
         temp = None
@@ -55,6 +60,7 @@ class TSensors(list):
 
     # Try this to prevent multiple instances to monitor
     running = False
+    # move to some config
     names = {'28-3c01b607ee7e':'pool',
              '28-3c01b607b5a1':'pump'}
 

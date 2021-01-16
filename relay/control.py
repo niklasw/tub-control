@@ -5,6 +5,8 @@ from relay.timer2 import Timer
 from sensors import TSensors, ds18b20
 from relay.utils import *
 
+from relay.logger import logger
+
 
 # Fixme: make relay control independent of buttons. Control relay directly
 # instead.
@@ -22,15 +24,17 @@ class Relay_control:
         self.sensors = TSensors(ds18b20)
         self.sensors.read()
 
-        self.get_status()
+        self.buttons.get_status()
 
         self.set_temperatures = {'pool':18, 'pump': 18}
         Info('Creating Relay_control')
         
-    def get_status(self):
-        self.aux_on = self.relay.get_port_status(self.rid_aux)
-        self.pump_on = self.relay.get_port_status(self.rid_pump)
-        self.heat_on = self.relay.get_port_status(self.rid_heat)
+    def pump_running(self):
+        return self.relay.get_port_status(self.rid_pump)
+    def heat_running(self):
+        return self.relay.get_port_status(self.rid_heat)
+    def aux_running(self):
+        return self.relay.get_port_status(self.rid_aux)
 
     def start_timer(self):
         if not self.timer.running:
@@ -49,42 +53,42 @@ class Relay_control:
 
     def monitor_inputs(self):
         while not self.stop_threads:
-            time.sleep(1)
-            self.get_status()
+            time.sleep(0.1)
+            self.buttons.get_status()
             self.timer.get_status()
-            self.sensors.get_status()
-            Debug(self.sensors)
             Debug(self.timer)
             #if self.timer.active() and not self.heat_on:
             if self.timer.active:
                 if self.timer.on:
-                    if not self.pump_on:
+                    if not self.buttons.pump_on:
                         self.buttons.pump()
                         Debug(f'timer turns ON pump {self.timer.duration}')
-                elif self.pump_on:
+                elif self.buttons.pump_on:
                     self.buttons.pump()
                     Debug(f'timer turns OFF pump {self.timer.duration}')
                     if not self.timer.interval:
                         self.timer.stop()
 
-            self.get_status()
+            self.sensors.get_status()
+            Debug(self.sensors)
+            self.buttons.get_status()
             if self.sensors.active:
                 temps = self.sensors.values
                 if temps['pump'] < self.set_temperatures['pump']:
-                    if not self.pump_on:
+                    if not self.buttons.pump_on:
                         self.timer.set(0,10)
                 else:
-                    if self.pump_on and not self.timer.on and not self.timer.interval:
+                    if self.buttons.pump_on and not self.timer.on and not self.timer.interval:
                         self.buttons.pump()
                         self.timer.active = False
                         Debug('sensor turns OFF pump')
 
                 if temps['pool'] < self.set_temperatures['pool']:
-                    if not self.heat_on:
+                    if not self.buttons.heat_on:
                         self.buttons.heat()
                         Debug('sensor turns ON heat')
                 elif temps['pool'] >= self.set_temperatures['pool']+1:
-                    if self.heat_on:
+                    if self.buttons.heat_on:
                         self.buttons.heat()
                         Debug('sensor turns OFF heat')
         Info('Thread monitor_inputs stopped')
