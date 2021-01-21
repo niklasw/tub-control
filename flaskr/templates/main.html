@@ -26,6 +26,7 @@
     body {
         background-color: #454545;
         font-family: Verdana, sans-serif;
+        /*font-family: 'Courier New', monospace;*/
         font-size: 44px;
         color: #d3d3d3;
     }
@@ -71,17 +72,15 @@
     .grid-container {
         display: grid;
         grid-template-columns: auto auto auto;
+        align-items: center;
+        border-radius: 10px;
     }
 
     .grid-item {
         text-align: center;
-        margin: 10px;
-        border-radius: 15px;
-        border-width: 1px;
     }
 
     .grid-item .temps {
-        padding-top: 10%;
     }
 
     p {
@@ -116,8 +115,6 @@
     input[type="number"] {
         width: 80px;
         background-color: #aaaaaa;
-        border-width:0px;
-        border-radius: 10px;
     }
 
     input.sensors_on {
@@ -211,10 +208,10 @@
             <p>{{pump_temp}}</p>
         </div>
 
-        <div class="grid-item {{sensors_status}}">
+        <div class="grid-item">
             <form class="temps" id="pump-temp" action="/control/pump_temp" method="post">
                 <input class="{{sensors_status}}" id="pump_temp"  name="temp" type="number" min="0" step="1" value="{{set_pump_temp}}"/>
-                <input type="submit" value="OK"/>
+                <input class="{{sensors_status}}" type="submit" value="OK"/>
             </form>
         </div>
 
@@ -229,10 +226,10 @@
             <p>{{pool_temp}}</p>
         </div>
 
-        <div class="grid-item {{sensors_status}}">
+        <div class="grid-item">
             <form class="temps" id="pool-temp" action="/control/pool_temp" method="post">
                 <input class="{{sensors_status}}" id="pool_temp" name="temp" type="number" min="0" max="39" step="1" value="{{set_pool_temp}}"/>
-                <input type="submit" value="OK"/>
+                <input class="{{sensors_status}}" type="submit" value="OK"/>
             </form>
         </div>
 
@@ -242,7 +239,7 @@
 
     <div class="box timer {{timer_status}}" >
         <form id="timer-control" action="/control/timer" method="post" value="{{interval}}">
-            <label for="timer_interval">Intervall:</label>
+            <label for="timer_interval">Int.:</label>
             <select id="timer_interval" name="timer_interval">
                 {% for key,value in intervals.items() %}
                 <option value="{{key}}" {%if key == interval %} selected {% endif %}>{{value}}</option>
