@@ -1,10 +1,13 @@
 # tub-control
-Flask app to control pump and heater using raspberry pi and temp sensors
+Flask app to control pump and heater using raspberry pi equipped with a relay
+board and temp sensors. Web interface for on/off control via buttons, timer
+or sensors.
 
 ## Requires
 > Python3
 
 > Raspberry pi with a seeed relay board: https://wiki.seeedstudio.com/Raspberry_Pi_Relay_Board_v1.0/
+> and "one wire" temperature sensors type ds18b20
 
 ## In this folder, do the following:
 ### Create a python container/environment
@@ -14,4 +17,4 @@ Flask app to control pump and heater using raspberry pi and temp sensors
 ### Install all python stuff needed
 `pip install -r requirements.txt`
 ### Start the server
-`python3 ./pool-control.py'
+`python3 ./tub-control.py'
