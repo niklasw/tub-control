@@ -5,6 +5,7 @@ import flaskr
 from sensors import TSensors, ds18b20
 import relay
 from relay.utils import *
+from plotter import Plotter
 from flask_socketio import SocketIO, emit
 
 control = relay.init_controls()
@@ -72,9 +73,11 @@ def relay_toggle(action):
 
 @app.route('/plot')
 def plot():
-    plotter = relay.Plotter(control)
+    plotter = Plotter(control)
 
-    columns = list(control.sensors.log_data()) + list(control.log_data().keys())
+    columns = list(control.sensors.log_data())
+    columns+= list(control.log_data())
+
     plotter.get_data('day', columns)
 
     return redirect(url_for('index'))
