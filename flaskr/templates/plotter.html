@@ -1,0 +1,31 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Pool control</title>
+  <meta name="description" content="pool control">
+  <meta name="author" content="niklas">
+
+  <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+
+    <div class="page">
+
+    <div class="box title">
+        <a href="index"><h2>Badkontrollen</h2></a>
+    </div>
+
+    <div class="box controls">
+        {% for item in plot_data %}
+        <p style="font-size: 14px;">{{item}}</p>
+        {% endfor %}
+    </div>
+
+    </div>
+
+</body>
+

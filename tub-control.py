@@ -78,9 +78,13 @@ def plot():
     columns = list(control.sensors.log_data())
     columns+= list(control.log_data())
 
-    plotter.get_data('day', columns)
+    data = plotter.get_data('day', columns)
 
-    return redirect(url_for('index'))
+    plotter.quit()
+
+    return render_template('plotter.html', \
+                            plot_data = data)
+                            
 
 
 

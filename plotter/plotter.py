@@ -48,8 +48,5 @@ class Plotter:
         sql = f'''SELECT time, {list_fill} FROM "{self.table_name}";'''
         print(sql)
         cursor = self.db.execute(sql)
-        for item in cursor.fetchall():
-            print(item)
-        self.db.close()
-        print(self.db)
+        return cursor.fetchall()
 
