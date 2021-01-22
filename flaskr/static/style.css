@@ -1,0 +1,144 @@
+body {
+    background-color: #454545;
+    font-family: Verdana, sans-serif;
+    /*font-family: 'Courier New', monospace;*/
+    font-size: 44px;
+    color: #d3d3d3;
+}
+
+a:link, a:visited {
+    color: #8db1d1;
+    padding: 15px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 30px;
+}
+
+a:hover, a:active {
+    background-color: #555555;
+}
+
+.page {
+    background-color: #353535;
+    width: 80%;
+    padding: 20px;
+    border-radius: 30px;
+    margin: 30px auto;
+}
+
+.box {
+    padding: 15px;
+    margin: 15px auto;
+    border-radius: 30px;
+    width: 90%;
+}
+
+.title {
+    background-color: #454545;
+    text-align: center;
+}
+
+.controls {
+    background-color: #454545;
+    font-size: 44px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.grid-item {
+    text-align: center;
+}
+
+.grid-item .temps {
+}
+
+p {
+    color: #aaaaaa;
+}
+
+p.error {
+    color: red;
+}
+
+.sensors_on {
+    background-color: #ca4020;
+}
+
+select {
+    background-color: #aaaaaa;
+    font-color: #353535;
+    border-width:0px;
+    border-radius: 10px;
+    font-size: 44px;
+}
+
+input {
+    font-size: 44px;
+    font-color: #353535;
+    width: 80px;
+    background-color: #aaaaaa;
+    border-width:0px;
+    border-radius: 10px;
+}
+
+input[type="number"] {
+    width: 80px;
+    background-color: #aaaaaa;
+}
+
+input.sensors_on {
+    background-color: #ca4020;
+}
+
+input.sensors_off {
+    background-color: #aaaaaa;
+}
+
+
+form label {
+    font-size: 44px;
+    padding: 15px;
+}
+
+.timer {
+    background-color: #454545;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    text-align: center;
+}
+
+.timer_on {
+    background-color: #ca4020;
+}
+
+.timer_off {
+    background-color: #454545;
+}
+
+.toggle {
+    background-color: #356D29; /* Green */
+    width: 200px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    padding: 15px 32px;
+    margin: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 44px;
+    vertical-align: text-bottom;
+}
+
+.button_on {
+    background-color: #ca4020;
+}
+.button_off {
+    background-color: #356D29;
+}
