@@ -34,6 +34,10 @@ a:hover, a:active {
     width: 90%;
 }
 
+.box img {
+    align: center;
+}
+
 .title {
     background-color: #454545;
     text-align: center;

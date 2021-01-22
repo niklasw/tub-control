@@ -3,6 +3,9 @@ import sqlite3
 from relay.utils import *
 from pathlib import Path
 from datetime import datetime,timedelta
+from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
+from numpy import array
 
 class Plotter:
 
@@ -16,6 +19,7 @@ class Plotter:
         self.control = control
         self.db = None
         self.table_name = Configured.db_table_name
+        self.columns = None
 
     def connect(self):
         if not self.db:
@@ -42,11 +46,26 @@ class Plotter:
         start_time = end_time - self.time_deltas[dt]
         return (start_time, end_time)
 
-    def get_data(self,dt,columns):
+    def get_data(self, dt, time_range=None):
         self.connect()
-        list_fill = ', '.join(columns)
+        list_fill = ', '.join(self.columns)
         sql = f'''SELECT time, {list_fill} FROM "{self.table_name}";'''
         print(sql)
         cursor = self.db.execute(sql)
-        return cursor.fetchall()
+        return array(cursor.fetchall())
+
+    def simple_plot(self, data):
+        data = data.transpose()
+        fig, axis = plt.subplots(figsize=(12.96,8), facecolor='#454545')
+        axis.set_facecolor('#454545')
+        axis.tick_params(labelcolor='tab:orange')
+        axis.plot(data[0], data[1], label=self.columns[0])
+        axis.plot(data[0], data[2], label=self.columns[1])
+        axis.grid(True, color='#353535')
+        axis.legend()
+        fig_url = '/static/images/plot.png'
+        plt.savefig('flaskr'+fig_url)
+        return fig_url
+
+
 

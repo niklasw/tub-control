@@ -73,20 +73,27 @@ def relay_toggle(action):
 
 @app.route('/plot')
 def plot():
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    from datetime import datetime
+
     plotter = Plotter(control)
 
     columns = list(control.sensors.log_data())
     columns+= list(control.log_data())
 
-    data = plotter.get_data('day', columns)
+    plotter.columns = columns
+    data = plotter.get_data('day')
+    img_url = plotter.simple_plot(data)
 
     plotter.quit()
 
+    reload_thing = '?'+str(int(datetime.now().timestamp()))
+
     return render_template('plotter.html', \
-                            plot_data = data)
+                            plot_data = data,
+                            image = img_url+reload_thing)
                             
-
-
 
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
