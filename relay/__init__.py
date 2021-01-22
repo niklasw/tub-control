@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+from relay.plotter import Plotter
 
 def init_controls():
     from relay.seeed_relay import Relay

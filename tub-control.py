@@ -8,7 +8,6 @@ from relay.utils import *
 from flask_socketio import SocketIO, emit
 
 control = relay.init_controls()
-
 app = flaskr.create_app()
 
 @app.route('/')
@@ -62,21 +61,35 @@ def relay_toggle(action):
         control.timer.set(int(interval),int(duration))
     elif action == 'pool_temp':
         control.set_temperatures['pool'] = int(request.form['temp'])
-        control.sensors.active = False if control.sensors.active else True
+        control.sensors.active = not control.sensors.active
     elif action == 'pump_temp':
         control.set_temperatures['pump'] = int(request.form['temp'])
-        control.sensors.active = False if control.sensors.active else True
+        control.sensors.active = not control.sensors.active
     else:
         return "Wrong action error "+action
 
     return redirect(url_for('index'))
 
+@app.route('/plot')
+def plot():
+    plotter = relay.Plotter(control)
+
+    columns = list(control.sensors.log_data()) + list(control.log_data().keys())
+    plotter.get_data('day', columns)
+
+    return redirect(url_for('index'))
+
+
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    Warning('Shutting server down')
+    func()
 
 if __name__ == '__main__':
-   try:
-       app.run(host="192.168.10.202", port=5000, debug=True)
-   except KeyboardInterrupt:
-       control.quit()
+    app.run(host="192.168.10.202", port=5000, debug=False)
 
 
 

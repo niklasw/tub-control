@@ -21,7 +21,7 @@ class Relay():
         self.DEVICE_REG_MODE1 = 0x06
         try:
             self.DEVICE_REG_DATA = \
-                    bus.read_byte_data(self.DEVICE_ADDRESS, self.DEVICE_REG_MODE1)
+                bus.read_byte_data(self.DEVICE_ADDRESS, self.DEVICE_REG_MODE1)
         except:
             self.DEVICE_REG_DATA = 0xff
             try:
@@ -150,7 +150,7 @@ class Relay():
         if relay_num in range(0,self.N_PORTS):
             # read the memory location
             self.DEVICE_REG_DATA = \
-                    bus.read_byte_data(self.DEVICE_ADDRESS, self.DEVICE_REG_MODE1)
+                bus.read_byte_data(self.DEVICE_ADDRESS, self.DEVICE_REG_MODE1)
             # return the specified bit status
             return self.DEVICE_REG_DATA
         else:

@@ -5,9 +5,10 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import threading
 from relay.utils import *
+from collections import OrderedDict
 
 
-class Timer:
+class Timer(Configured):
 
     units = ['d', 'h', 'm', 's']
     interval_choices = [0, 60, 3600, 7200, 14400, 86400]
@@ -32,7 +33,7 @@ class Timer:
 
         self.thread = None
         self.stop_threads = True
-        Info('Creating timer')
+        Info('Creating Timer')
 
     def __str__(self):
         s = f'Timer status: active = {self.active} on = {self.on}\n'
@@ -114,6 +115,10 @@ class Timer:
         r_list.append(d)
         s = ' '.join(reversed(r_list))
         return s.strip()
+
+    def log_data(self):
+        return OrderedDict([('timer',int(self.on))])
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 

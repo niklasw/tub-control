@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import sys, time, threading
-from relay import utils
+from relay.utils import *
+from collections import OrderedDict
 
 class ds18b20:
     devices_path  = Path('/sys/bus/w1/devices')
@@ -20,12 +21,10 @@ class ds18b20:
         
     def check(self):
         if (self.dev_path/self.data_file).exists():
-            if self.read() > -100:
+            self.read()
+            if self.temp is not None:
                 return True
         return False
-
-    def active(self):
-        return self.check() and self.temp
 
     def read(self):
         import re
@@ -56,7 +55,15 @@ class ds18b20:
         self.temp = temp
         return self.temp
 
-class TSensors(list):
+    def log_data(self):
+        if self.temp is not None:
+            ttemp = self.temp
+        else:
+            ttemp = -40
+        return OrderedDict([(self.name, ttemp)])
+
+
+class TSensors(list, Configured):
 
     # Try this to prevent multiple instances to monitor
     running = False
@@ -73,7 +80,7 @@ class TSensors(list):
         self.ok = False
 
         super().__init__( (sensor_type(a) for a in self.ls_devices()) )
-        print('Creating sensors')
+        Info('Creating TSensors')
 
     def __str__(self):
         s = f'Sensors status: active = {self.active} ok = {self.ok}\n'
@@ -119,6 +126,12 @@ class TSensors(list):
        self.thread.join()
        self.running = False
        print('\nStopped monitor thread')
+
+    def log_data(self):
+        odict = OrderedDict()
+        for s in self:
+            odict.update(s.log_data())
+        return odict
 
 
 if __name__ == '__main__':

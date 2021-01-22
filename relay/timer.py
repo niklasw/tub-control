@@ -59,7 +59,7 @@ class Timer:
         if self.active:
             up_time = datetime.now() - self.start_time
             self.remaining = max(self.duration - up_time.seconds, 0)
-            self.on = True if self.remaining > 0 else False
+            self.on = self.remaining > 0
             if self.interval and up_time.seconds > self.interval:
                 self.start_time = datetime.now()
             # deactivate if no time left and not repeating

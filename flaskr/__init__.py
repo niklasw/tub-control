@@ -6,7 +6,7 @@ def create_app():
     app = Flask(__name__)
     
     app.config['FLASK_HTPASSWD_PATH'] = Path(Path.cwd(),'.htpasswd').as_posix()
-    app.config['FLASK_SECRET'] = 'Hey Hey Kids, secure me!'
+    app.config['FLASK_SECRET'] = 'hey Hey Kids, secure me!'
     app.config['FLASK_AUTH_ALL']=True
     htpasswd = HtPasswdAuth(app)
 

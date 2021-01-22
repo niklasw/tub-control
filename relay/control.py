@@ -5,37 +5,28 @@ from relay.timer2 import Timer
 from sensors import TSensors, ds18b20
 from relay.utils import *
 
-from relay.logger import logger
+from relay.logger import DbLogger
+from pathlib import Path
+from collections import OrderedDict
 
 
 # Fixme: make relay control independent of buttons. Control relay directly
 # instead.
-class Relay_control:
-
-    rid_pump = 0
-    rid_heat = 1
-    rid_aux = 2
+class Relay_control(Configured):
 
     def __init__(self, relay):
         self.stop_threads = False
         self.relay = relay
-        self.buttons = Relay_buttons(relay, self.rid_pump, self.rid_heat, self.rid_aux)
+        self.buttons = Relay_buttons(relay)
         self.timer = Timer()
         self.sensors = TSensors(ds18b20)
         self.sensors.read()
 
         self.buttons.get_status()
 
-        self.set_temperatures = {'pool':18, 'pump': 18}
+        self.set_temperatures = {'pool':18, 'pump': 3}
         Info('Creating Relay_control')
         
-    def pump_running(self):
-        return self.relay.get_port_status(self.rid_pump)
-    def heat_running(self):
-        return self.relay.get_port_status(self.rid_heat)
-    def aux_running(self):
-        return self.relay.get_port_status(self.rid_aux)
-
     def start_timer(self):
         if not self.timer.running:
             self.timer.go()
@@ -49,9 +40,13 @@ class Relay_control:
         #self.start_sensors()
         self.thread = threading.Thread(target = self.monitor_inputs)
         self.thread.name = 'control_monitor'
+        self.thread.daemon = True
         self.thread.start()
 
     def monitor_inputs(self):
+        logger = DbLogger(Path(self.database), \
+                          [self.buttons, self.timer, self.sensors, self])
+
         while not self.stop_threads:
             time.sleep(0.1)
             self.buttons.get_status()
@@ -78,7 +73,7 @@ class Relay_control:
                     if not self.buttons.pump_on:
                         self.timer.set(0,10)
                 else:
-                    if self.buttons.pump_on and not self.timer.on and not self.timer.interval:
+                    if not (self.buttons.pump_on or self.timer.on or self.timer.interval):
                         self.buttons.pump()
                         self.timer.active = False
                         Debug('sensor turns OFF pump')
@@ -91,6 +86,9 @@ class Relay_control:
                     if self.buttons.heat_on:
                         self.buttons.heat()
                         Debug('sensor turns OFF heat')
+
+            logger.update()
+            
         Info('Thread monitor_inputs stopped')
 
                 
@@ -103,45 +101,56 @@ class Relay_control:
        self.thread.join()
        Info('\nStopped control thread')
 
+    def log_data(self):
+        names = ['set_temp_pump', 'set_temp_pool']
+        values= [self.set_temperatures['pump'], self.set_temperatures['pool']]
+        return OrderedDict(zip(names,values))
+
                    
-class Relay_buttons:
-    def __init__(self, relay, pump_id, heat_id, aux_id):
+class Relay_buttons(Configured):
+
+    def __init__(self, relay):
         self.relay = relay
-        self.pump_id = pump_id
-        self.heat_id = heat_id
-        self.aux_id = aux_id
         self.pump_on = None
         self.heat_on = None
         self.aux_on = None
         Info('Creating Relay_buttons')
 
     def get_status(self):
-        self.pump_on = self.relay.get_port_status(self.pump_id)
-        self.heat_on = self.relay.get_port_status(self.heat_id)
-        self.aux_on = self.relay.get_port_status(self.aux_id)
+        self.pump_on = self.relay.get_port_status(self.rid_pump)
+        self.heat_on = self.relay.get_port_status(self.rid_heat)
+        self.aux_on = self.relay.get_port_status(self.rid_aux)
 
     def heat(self):
         self.get_status()
         if self.heat_on:
-            self.relay.off(self.heat_id)
+            self.relay.off(self.rid_heat)
         else:
             if not self.pump_on:
-                self.relay.on(self.pump_id)
-            self.relay.on(self.heat_id)
+                self.relay.on(self.rid_pump)
+            self.relay.on(self.rid_heat)
     
     def pump(self):
         self.get_status()
         if self.pump_on:
             if not self.heat_on:
-                self.relay.off(self.pump_id)
+                self.relay.off(self.rid_pump)
         else:
-            self.relay.on(self.pump_id)
+            self.relay.on(self.rid_pump)
 
     def aux(self):
         self.get_status()
         if self.aux_on:
-            self.relay.off(self.aux_id)
+            self.relay.off(self.rid_aux)
         else:
-            self.relay.on(self.aux_id)
+            self.relay.on(self.rid_aux)
 
+    def log_row(self):
+        # aux pump heat
+        return [int(a) for a in [self.aux_on, self.pump_on, self.heat_on]]
+
+    def log_data(self):
+        names = ['aux_on', 'pump_on', 'heat_on']
+        values= [int(a) for a in [self.aux_on, self.pump_on, self.heat_on]]
+        return OrderedDict(zip(names,values))
 
