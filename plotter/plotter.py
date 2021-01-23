@@ -56,13 +56,27 @@ class Plotter:
 
     def simple_plot(self, data):
         data = data.transpose()
-        fig, axis = plt.subplots(figsize=(12.96,8), facecolor='#454545')
-        axis.set_facecolor('#454545')
-        axis.tick_params(labelcolor='tab:orange')
-        axis.plot(data[0], data[1], label=self.columns[0])
-        axis.plot(data[0], data[2], label=self.columns[1])
-        axis.grid(True, color='#353535')
-        axis.legend()
+        fig, (ax1, ax2) = plt.subplots(nrows=2, \
+                                       figsize=(12.96,8), \
+                                       facecolor='#454545', \
+                                       constrained_layout=True)
+
+        ax1.set_facecolor('#454545')
+        ax1.tick_params(labelcolor='tab:orange')
+        ax1.plot(data[0], data[1], label=self.columns[0])
+        ax1.plot(data[0], data[2], label=self.columns[1])
+        ax1.grid(True, color='#353535')
+        ax1.legend()
+
+        ax2.set_facecolor('#454545')
+        ax2.tick_params(labelcolor='tab:orange')
+        ax2.plot(data[0], data[5], '--', label=self.columns[4], linewidth=2)
+        ax2.plot(data[0], data[6]+0.01, label=self.columns[5])
+        ax2.plot(data[0], data[7]+0.02, label=self.columns[6])
+        ax2.plot(data[0], data[8]+0.03, label=self.columns[7])
+        ax2.grid(True, color='#353535')
+        ax2.legend()
+
         fig_url = '/static/images/plot.png'
         plt.savefig('flaskr'+fig_url)
         return fig_url

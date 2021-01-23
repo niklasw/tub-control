@@ -19,7 +19,7 @@ class DbLogger:
 
     def __init__(self, log, actors):
         self.table_name = Configured.db_table_name
-        self.interval = 2 
+        self.interval = 10 
         self.last_dump = datetime.now()
         self.actors = actors
         try:

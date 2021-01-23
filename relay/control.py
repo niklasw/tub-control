@@ -45,7 +45,7 @@ class Relay_control(Configured):
 
     def monitor_inputs(self):
         logger = DbLogger(Path(self.database), \
-                          [self.buttons, self.timer, self.sensors, self])
+                          [self.buttons, self.timer, self.sensors, self.relay, self])
 
         while not self.stop_threads:
             time.sleep(0.1)
@@ -73,7 +73,7 @@ class Relay_control(Configured):
                     if not self.buttons.pump_on:
                         self.timer.set(0,10)
                 else:
-                    if not (self.buttons.pump_on or self.timer.on or self.timer.interval):
+                    if self.buttons.pump_on and not (self.timer.on or self.timer.interval):
                         self.buttons.pump()
                         self.timer.active = False
                         Debug('sensor turns OFF pump')
@@ -144,10 +144,6 @@ class Relay_buttons(Configured):
             self.relay.off(self.rid_aux)
         else:
             self.relay.on(self.rid_aux)
-
-    def log_row(self):
-        # aux pump heat
-        return [int(a) for a in [self.aux_on, self.pump_on, self.heat_on]]
 
     def log_data(self):
         names = ['aux_on', 'pump_on', 'heat_on']

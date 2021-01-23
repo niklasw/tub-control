@@ -59,7 +59,7 @@ class ds18b20:
         if self.temp is not None:
             ttemp = self.temp
         else:
-            ttemp = -40
+            ttemp = -100
         return OrderedDict([(self.name, ttemp)])
 
 

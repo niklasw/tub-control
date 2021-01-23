@@ -9,7 +9,7 @@ from plotter import Plotter
 from flask_socketio import SocketIO, emit
 
 control = relay.init_controls()
-app = flaskr.create_app()
+app, htpasswd = flaskr.create_app()
 
 @app.route('/')
 @app.route('/index')
@@ -44,7 +44,11 @@ def index():
                                    if control.sensors.active else 'sensors_off')
 
 @app.route('/control/<action>', methods=['GET', 'POST'])
-def relay_toggle(action):
+@htpasswd.required
+def relay_toggle(action, user):
+
+    if user == 'guest':
+        return redirect(url_for('index'))
 
     if action == 'pump':
         control.buttons.pump()
@@ -81,6 +85,8 @@ def plot():
 
     columns = list(control.sensors.log_data())
     columns+= list(control.log_data())
+    columns+= list(control.timer.log_data())
+    columns+= list(control.relay.log_data())
 
     plotter.columns = columns
     data = plotter.get_data('day')

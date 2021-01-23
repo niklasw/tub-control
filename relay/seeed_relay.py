@@ -6,6 +6,7 @@ import sys, signal, smbus
 from pathlib import Path
 from datetime import datetime
 from relay.utils import *
+from collections import OrderedDict
 
 
 bus = smbus.SMBus(1)  # 0 = /dev/i2c-0 (port I2C0), 1 = /dev/i2c-1 (port I2C1)
@@ -169,6 +170,14 @@ class Relay():
         else:
             Error("Specified relay port is invalid")
             return False
+
+    def log_data(self):
+        odict = OrderedDict()
+        for i in range(self.N_PORTS):
+            value = self.get_port_status(i)
+            odict[f'relay_port_{str(i)}'] = int(value)
+        return odict
+
 
 if __name__ == "__main__":
     relay = Relay()
