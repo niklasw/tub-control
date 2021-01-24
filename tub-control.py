@@ -75,8 +75,8 @@ def relay_toggle(action, user):
 
     return redirect(url_for('index'))
 
-@app.route('/plot')
-def plot():
+@app.route('/plot/<interval>')
+def plot(interval):
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
     from datetime import datetime
@@ -89,7 +89,7 @@ def plot():
     columns+= list(control.relay.log_data())
 
     plotter.columns = columns
-    data = plotter.get_data('day')
+    data = plotter.get_data(interval)
     img_url = plotter.simple_plot(data)
 
     plotter.quit()
@@ -101,12 +101,12 @@ def plot():
                             image = img_url+reload_thing)
                             
 
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    Warning('Shutting server down')
-    func()
+#def shutdown_server():
+#    func = request.environ.get('werkzeug.server.shutdown')
+#    if func is None:
+#        raise RuntimeError('Not running with the Werkzeug Server')
+#    Warning('Shutting server down')
+#    func()
 
 if __name__ == '__main__':
     app.run(host="192.168.10.202", port=5000, debug=False)

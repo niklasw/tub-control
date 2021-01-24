@@ -8,7 +8,7 @@
   <meta name="description" content="pool control">
   <meta name="author" content="niklas">
 
-  <link rel="stylesheet" href="static/style.css">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
@@ -16,18 +16,20 @@
     <div class="page">
 
     <div class="box title">
-        <a href="index"><h2>Badkontrollen</h2></a>
+        <a href="/index"><h2>Badkontrollen</h2></a>
     </div>
 
-    <div class="box controls">
+    <div class="box timer">
+        <span style="font-size: 20px;">
+        <a href="/plot/hour">timme</a>
+        <a href="/plot/hours">6 timmar</a>
+        <a href="/plot/day">dag</a>
+        <a href="/plot/week">vecka</a>
+        <a href="/plot/month">m&aring;nad</a>
+        <a href="/plot/year">&aring;r</a>
+        </span>
+
         <img src="{{image}}" width="95%" alt="{{image}}"/>
-        <!--{% for row in plot_data %}
-        <p style="font-size: 14px;">
-            {% for item in row %}
-            {{item}}  
-            {% endfor %}
-        </p>
-        {% endfor %} -->
     </div>
 
     </div>

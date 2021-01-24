@@ -35,7 +35,7 @@ a:hover, a:active {
 }
 
 .box img {
-    align: center;
+    margin: auto;
 }
 
 .title {
@@ -46,6 +46,13 @@ a:hover, a:active {
 .controls {
     background-color: #454545;
     font-size: 44px;
+}
+
+.plots {
+    background-color: #454545;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    text-align: center;
 }
 
 .grid-container {
