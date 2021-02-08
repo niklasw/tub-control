@@ -48,6 +48,7 @@ class Plotter:
     def get_time_range(self,dt='day', end_time=datetime.now()):
         seconds = self.time_deltas[dt]
         start_time = end_time - self.time_deltas[dt]
+        print(f'Plot between {start_time} and {end_time}')
         return (start_time, end_time)
 
     def get_data(self, dt, time_range=None):

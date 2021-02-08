@@ -90,6 +90,7 @@ def plot(interval):
 
     plotter.columns = columns
     data = plotter.get_data(interval)
+    print('Plotter data shape =', data.shape)
     img_url = plotter.simple_plot(data)
 
     plotter.quit()

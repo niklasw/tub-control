@@ -9,6 +9,7 @@ class ds18b20:
     device_prefix = '28-'
     slave_file = 'w1_slave'
     precision = 0.001
+    err_temp = -100
 
     def __init__(self, device_path):
         self.dev_path = device_path
@@ -19,14 +20,22 @@ class ds18b20:
         self.name = TSensors.names[self.id]
         self.read()
         
+
+    def check_device(self):
+        return  (self.dev_path/self.data_file).exists()
+
     def check(self):
-        if (self.dev_path/self.data_file).exists():
+        if self.check_device():
             self.read()
             if self.temp is not None:
                 return True
         return False
 
     def read(self):
+        if not self.check_device():
+            self.temp = self.err_temp
+            return self.err_temp
+
         import re
         lines = []
         # Give it a few tries
@@ -42,7 +51,7 @@ class ds18b20:
                 Info('device read problem, retrying')
         pat1 = re.compile('.*\st=(-?[0-9]+)')
 
-        temp = None
+        temp = self.err_temp
 
         for line in lines:
             match = pat1.search(line)
@@ -59,7 +68,7 @@ class ds18b20:
         if self.temp is not None:
             ttemp = self.temp
         else:
-            ttemp = -100
+            ttemp = self.err_temp 
         return OrderedDict([(self.name, ttemp)])
 
 
@@ -69,7 +78,9 @@ class TSensors(list, Configured):
     running = False
     # move to some config
     names = {'28-3c01b607ee7e':'pool',
-             '28-3c01b607b5a1':'pump'}
+             '28-3c01b607b5a1':'pump',
+             '28-0120358fb53e':'pool',
+             '28-012035906bf0':'pump'}
 
     def __init__(self, sensor_type):
         self.type = sensor_type
@@ -81,6 +92,7 @@ class TSensors(list, Configured):
 
         super().__init__( (sensor_type(a) for a in self.ls_devices()) )
         Info('Creating TSensors')
+        self.values = {'pool':100,'pump':100}
 
     def __str__(self):
         s = f'Sensors status: active = {self.active} ok = {self.ok}\n'

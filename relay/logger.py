@@ -22,6 +22,7 @@ class DbLogger:
         self.interval = 60 
         self.last_dump = datetime.now()
         self.actors = actors
+        self.sql_queue = []
         try:
             # FIXME where and how to close this?
             self.db = sqlite3.connect(log)
@@ -42,9 +43,8 @@ class DbLogger:
 
     def has_table(self, name):
         cursor = self.db.cursor()
-        cursor.execute(f'''SELECT name FROM sqlite_master
-                           WHERE type="table"
-                           AND name="{name}";''')
+        sql = f'''SELECT name FROM sqlite_master WHERE type="table" AND name="{name}";'''
+        cursor.execute(sql)
         return cursor.fetchone()
 
     def create_table(self, name):
@@ -86,6 +86,12 @@ class DbLogger:
 
         #c = self.db.execute('SELECT * FROM "history";')
         #Print(c.fetchall())
+
+    def get_last_row(self):
+        sql = f'''SELECT * FROM {self.table_name} WHERE   ID =
+                  (SELECT MAX(ID)  FROM {self.table_name});'''
+        result = self.db.cursor().execute(sql)
+        return result.fetchone()
 
 if __name__ == '__main__':
     log = DbLogger('log_db.sql')
