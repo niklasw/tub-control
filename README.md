@@ -14,7 +14,9 @@ or sensors.
 > - libopenjp2-7-dev
 > - libtiff5
 
-## In this folder, do the following:
+## Usage
+`git clone <this repo> <target dir>`
+`cd <target_dir>`
 ### Create a python container/environment
 `python3 -m venv venv`
 ### Enter the sandbox
