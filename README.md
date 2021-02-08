@@ -3,6 +3,10 @@ Flask app to control pump and heater using raspberry pi equipped with a relay
 board and temp sensors. Web interface for on/off control via buttons, timer
 or sensors.
 
+Note to self: Do not sit in the snow fiddling with temperature sensors extension
+cables. Specifically, do not shortcut Rpi pins while sitting there: Fried at
+least two of the gpio connections and possibly the relay as well.
+
 ## Requires
 > Python3
 
