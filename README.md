@@ -8,7 +8,7 @@ cables. Specifically, do not shortcut Rpi pins while sitting there: Fried at
 least two of the gpio connections and possibly the relay as well.
 
 ## Requires
-> Python3
+> Python3 (v3.7+)
 
 > Raspberry pi with a seeed relay board: https://wiki.seeedstudio.com/Raspberry_Pi_Relay_Board_v1.0/
 > and "one wire" temperature sensors type ds18b20
