@@ -33,4 +33,4 @@ least two of the gpio connections and possibly the relay as well.
 `pip install -r requirements.txt`
 
 ### Start the server
-`python3 ./tub-control.py'
+`python3 ./tub-control.py`
