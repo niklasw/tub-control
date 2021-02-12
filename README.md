@@ -20,12 +20,17 @@ least two of the gpio connections and possibly the relay as well.
 
 ## Usage
 `git clone <this repo> <target dir>`
+
 `cd <target_dir>`
+
 ### Create a python container/environment
 `python3 -m venv venv`
+
 ### Enter the sandbox
 `source venv/bin/activate`
+
 ### Install all python stuff needed
 `pip install -r requirements.txt`
+
 ### Start the server
 `python3 ./tub-control.py'
