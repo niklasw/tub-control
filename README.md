@@ -34,7 +34,9 @@ least two of the gpio connections and possibly the relay as well.
 
 ### Cofigure sensors
 Check out if the sensors have been registred and edit sensors/sensors.py static variables to match (currently hard-coded)
+
 `ls /sys/bus/w1/devices/`
+
 The ds18b20 sensors should show as devices starting with "28-"
 
 ### Start the server
