@@ -55,6 +55,7 @@ class Relay_control(Configured):
                            self])
 
         while not self.stop_threads:
+            Debug('XXXXXXXXXXXXXXXXXXX')
             time.sleep(0.1)
             self.buttons.get_status()
             self.timer.get_status()
@@ -63,6 +64,7 @@ class Relay_control(Configured):
             temps = self.sensors.values
             Debug(self.sensors)
             Debug(self.remote_sensor)
+            Debug('YYYYYYYYYYYYYYYYYYY')
 
             # Do not allow pump to run with hot water
             high_temp = temps['pool'] > 39.0
@@ -70,7 +72,7 @@ class Relay_control(Configured):
                 self.buttons.heat_off()
                 self.buttons.pump_off()
                 logger.update()
-                return
+                continue
 
             #if self.timer.active() and not self.heat_on:
             if self.timer.active:
