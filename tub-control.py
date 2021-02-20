@@ -133,7 +133,7 @@ def plot(interval):
 #    func()
 
 if __name__ == '__main__':
-    app.run(host="192.168.10.210", port=5000, debug=False)
+    app.run(host="192.168.10.200", port=5000, debug=False)
 
 
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import sys, time, threading
+if __name__ == '__main__':
+    sys.path.append('../')
 from relay.utils import *
 from collections import OrderedDict
 

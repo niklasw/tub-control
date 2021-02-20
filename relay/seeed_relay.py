@@ -192,9 +192,7 @@ class DummyRelay():
         pass
 
     def __str__(self):
-        s = '[{0:d} {0:b}] '.format(self.DEVICE_REG_DATA)
-        s = s+' '.join((str(self.get_port_status(i)) for i in range(0,4)))
-        return s+'\n'
+        return 'DUMMY_RELAY\n'
 
 
     def on(self, rid):
