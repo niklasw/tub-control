@@ -8,7 +8,7 @@ cables. Specifically, do not shortcut Rpi pins while sitting there: Fried at
 least two of the gpio connections and possibly the relay as well.
 
 ## Requires
-> Python3
+> Python3 (v3.7+)
 
 > Raspberry pi with a seeed relay board: https://wiki.seeedstudio.com/Raspberry_Pi_Relay_Board_v1.0/
 > and "one wire" temperature sensors type ds18b20
@@ -20,12 +20,24 @@ least two of the gpio connections and possibly the relay as well.
 
 ## Usage
 `git clone <this repo> <target dir>`
+
 `cd <target_dir>`
+
 ### Create a python container/environment
 `python3 -m venv venv`
+
 ### Enter the sandbox
 `source venv/bin/activate`
+
 ### Install all python stuff needed
 `pip install -r requirements.txt`
+
+### Cofigure sensors
+Check out if the sensors have been registred and edit sensors/sensors.py static variables to match (currently hard-coded)
+
+`ls /sys/bus/w1/devices/`
+
+The ds18b20 sensors should show as devices starting with "28-"
+
 ### Start the server
-`python3 ./tub-control.py'
+`python3 ./tub-control.py`
