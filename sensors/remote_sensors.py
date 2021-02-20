@@ -7,6 +7,7 @@ if __name__ == '__main__':
     sys.path.append('../')
 from relay.utils import *
 from collections import OrderedDict
+from datetime import datetime, timedelta
 
 class curl_sensor(Configured):
 
@@ -17,6 +18,7 @@ class curl_sensor(Configured):
         self.running = False
         self.monitor_period=600
         self.stop_threads = False
+        self.last_read = datetime.now()
 
     def __str__(self):
         return f'Remote sensor {self.name} = {self.temp} C\n'
@@ -59,8 +61,10 @@ class curl_sensor(Configured):
 
     def monitor(self):
         while not self.stop_threads:
-            self.read()
-            time.sleep(self.monitor_period)
+            if datetime.now() >= self.last_read+timedelta(seconds=self.monitor_period):
+                self.read()
+                self.last_read = datetime.now()
+            time.sleep(0.1)
 
 
     def log_data(self):

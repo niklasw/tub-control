@@ -196,11 +196,11 @@ class DummyRelay():
 
 
     def on(self, rid):
-        Info('Dummy Relay: ON...')
+        Debug('Dummy Relay: ON...')
         Debug(self)
 
     def off(self,rid):
-        Info('Dummy Relay: OFF...')
+        Debug('Dummy Relay: OFF...')
         Debug(self)
 
     def toggle(self, rid):
@@ -211,10 +211,10 @@ class DummyRelay():
         return self.get_port_status(rid)
 
     def all_on(self):
-        Info('Dummy Relay: ALL ON...')
+        Debug('Dummy Relay: ALL ON...')
 
     def all_off(self):
-        Info('Dummy Relay: ALL OFF...')
+        Debug('Dummy Relay: ALL OFF...')
         Debug(self)
 
     def manual_toggle(self):
