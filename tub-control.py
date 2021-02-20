@@ -37,6 +37,7 @@ def index():
                            pump_temp = '{0:0.2f}'.format(temps['pump']),
                            set_pump_temp = '{0:d}'.format(control.set_temperatures['pump']),
                            set_pool_temp = '{0:d}'.format(control.set_temperatures['pool']),
+                           climate_temp = '{0:0.1f}'.format(control.remote_sensor.temp),
                            timer_status = 'timer_on' \
                                    if control.timer.active else 'timer_off',
                            timer_remain = control.timer.remaining(),
@@ -80,25 +81,47 @@ def plot(interval):
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
     from datetime import datetime
+    from numpy import average
 
     plotter = Plotter(control)
 
     columns = list(control.sensors.log_data())
+    columns+= list(control.remote_sensor.log_data())
     columns+= list(control.log_data())
     columns+= list(control.timer.log_data())
     columns+= list(control.relay.log_data())
 
     plotter.columns = columns
-    data = plotter.get_data(interval)
-    print('Plotter data shape =', data.shape)
-    img_url = plotter.simple_plot(data)
+    plotter.set_time_range(interval, end_time=datetime.now())
+    data = plotter.get_data()
+    Info('Plotter data shape =', data.shape)
+
+    img_url = '/static/images/plot.png'
+    plotter.simple_plot(data, img_url)
 
     plotter.quit()
 
+    try:
+        dTdt = plotter.dTdt(data, 'pool')
+        if len(dTdt) > 2:
+            avg_length = min(10, len(dTdt))
+            dTdt = average(dTdt[-avg_length:])
+        else:
+            dTdt = 0
+        pool_volume = 3500
+        Cp = 4200
+        rho =1.15
+        W = dTdt*pool_volume*rho*Cp
+    except:
+        Warning('Charge calculaion failed')
+        W = 0
+        dTdt = 0
+    
     reload_thing = '?'+str(int(datetime.now().timestamp()))
 
     return render_template('plotter.html', \
-                            plot_data = data,
+                            charge_rate = round(W),
+                            deg_per_hour = round(dTdt*3600,1),
                             image = img_url+reload_thing)
                             
 
@@ -110,7 +133,7 @@ def plot(interval):
 #    func()
 
 if __name__ == '__main__':
-    app.run(host="192.168.10.202", port=5000, debug=False)
+    app.run(host="192.168.10.210", port=5000, debug=False)
 
 
 

@@ -20,6 +20,7 @@ class Configured:
     cwd = Path.cwd()
     database = cwd/'log'/'db.sql'
     db_table_name = 'history'
+    err_temp = -100
 
     def log_row(self):
         print('ERROR: log_row() must be implemented in a Loggable class.')

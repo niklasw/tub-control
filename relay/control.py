@@ -2,7 +2,7 @@
 
 import time, threading
 from relay.timer2 import Timer
-from sensors import TSensors, ds18b20
+from sensors import TSensors, ds18b20, curl_sensor
 from relay.utils import *
 
 from relay.logger import DbLogger
@@ -20,7 +20,9 @@ class Relay_control(Configured):
         self.buttons = Relay_buttons(relay)
         self.timer = Timer()
         self.sensors = TSensors(ds18b20)
+        self.remote_sensor = curl_sensor('Sonat', 'http://minglarn.se/ha_sensor.php')
         self.sensors.read()
+        self.remote_sensor.start_monitor_thread()
 
         self.buttons.get_status()
 
@@ -45,7 +47,12 @@ class Relay_control(Configured):
 
     def monitor_inputs(self):
         logger = DbLogger(Path(self.database), \
-                          [self.buttons, self.timer, self.sensors, self.relay, self])
+                          [self.buttons, \
+                           self.timer, \
+                           self.sensors, \
+                           self.remote_sensor, \
+                           self.relay, \
+                           self])
 
         while not self.stop_threads:
             time.sleep(0.1)
@@ -55,6 +62,7 @@ class Relay_control(Configured):
             self.sensors.get_status()
             temps = self.sensors.values
             Debug(self.sensors)
+            Debug(self.remote_sensor)
 
             # Do not allow pump to run with hot water
             high_temp = temps['pool'] > 39.0

@@ -70,7 +70,6 @@ class DbLogger:
 
     def update(self):
         now = datetime.now()
-        now_str = now.strftime(self.time_fmt)
         row = []
         if (now - self.last_dump).total_seconds() > self.interval:
             row = [int(now.timestamp())]
