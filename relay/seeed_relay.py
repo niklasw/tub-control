@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # based on code from Seeed Studio Wiki
 # http://wiki.seeed.cc/Raspberry_Pi_Relay_Board_v1.0/
 
@@ -285,6 +285,7 @@ if __name__ == "__main__":
         try:
             while True:
                 relay.manual_toggle()
+                print(relay)
         except KeyboardInterrupt:
             end_process()
 

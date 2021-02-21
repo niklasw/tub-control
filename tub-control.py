@@ -2,6 +2,7 @@
 
 from flask import redirect, render_template, url_for, request
 import flaskr
+import os
 from sensors import TSensors, ds18b20
 import relay
 from relay.utils import *
@@ -133,7 +134,16 @@ def plot(interval):
 #    func()
 
 if __name__ == '__main__':
-    app.run(host="192.168.10.210", port=5000, debug=False)
+    print(f'PID: {os.getpid()}')
+
+    host = os.getenv('TUB_SERVER')
+    port = os.getenv('TUB_PORT')
+    host_ip = host if host else "192.168.10.210"
+    host_port = int(port) if port else 5000
+
+    app.run(host=host_ip, port=host_port, debug=False)
+
+    control.quit()
 
 
 

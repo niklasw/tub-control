@@ -2,7 +2,7 @@
 
 import time, threading
 from relay.timer2 import Timer
-from sensors import TSensors, ds18b20, curl_sensor
+from sensors import TSensors, ds18b20, Curl_sensor
 from relay.utils import *
 
 from relay.logger import DbLogger
@@ -20,7 +20,7 @@ class Relay_control(Configured):
         self.buttons = Relay_buttons(relay)
         self.timer = Timer()
         self.sensors = TSensors(ds18b20)
-        self.remote_sensor = curl_sensor('Sonat', 'http://minglarn.se/ha_sensor.php')
+        self.remote_sensor = Curl_sensor('Sonat', 'http://minglarn.se/ha_sensor.php')
         self.sensors.read()
         self.remote_sensor.start_monitor_thread()
 
@@ -88,7 +88,7 @@ class Relay_control(Configured):
             if self.sensors.active:
                 if temps['pump'] < self.set_temperatures['pump']:
                     if not self.buttons.pump_on:
-                        self.timer.set(0,10)
+                        self.timer.set(0,300)
                 else:
                     if self.buttons.pump_on and not (self.timer.on or self.timer.interval):
                         self.buttons.pump()
@@ -112,6 +112,7 @@ class Relay_control(Configured):
 
     def quit(self):
        Info('\nStopping control thread')
+       self.remote_sensor.quit()
        #self.timer.quit()
        #self.sensors.quit()
        self.stop_threads = True

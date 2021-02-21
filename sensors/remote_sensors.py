@@ -9,7 +9,7 @@ from relay.utils import *
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-class curl_sensor(Configured):
+class Curl_sensor(Configured):
 
     def __init__(self, name, url):
         self.name = name
@@ -18,6 +18,7 @@ class curl_sensor(Configured):
         self.running = False
         self.monitor_period=600
         self.stop_threads = False
+        self.read()
         self.last_read = datetime.now()
 
     def __str__(self):
@@ -54,10 +55,10 @@ class curl_sensor(Configured):
         if not self.running:
             self.running = True
             self.thread = threading.Thread(target = self.monitor)
-            self.thread.name = 'curl_sensor_monitor'
+            self.thread.name = 'Curl_sensor_monitor'
             self.thread.start()
         else:
-            print('\nWARNING: TSensors monitor is already running.')
+            print('\nWARNING: Curl_sensor monitor is already running.')
 
     def monitor(self):
         while not self.stop_threads:
@@ -75,11 +76,11 @@ class curl_sensor(Configured):
         return OrderedDict([(self.name, ttemp)])
 
     def quit(self):
-       print('\nStopping monitor thread. This can take some time.')
-       self.stop_threads = True
-       self.thread.join()
-       self.running = False
-       print('\nStopped monitor thread')
+        Info('\nStopping Curl_sensor monitor thread.')
+        self.stop_threads = True
+        self.thread.join()
+        self.running = False
+        Info('\nStopped Curl_sensor monitor thread')
 
 
 
@@ -88,13 +89,13 @@ if __name__ == '__main__':
     from datetime import datetime
     from time import sleep
 
-    sensor = curl_sensor('test', 'http://minglarn.se/ha_sensor.php')
+    sensor = Curl_sensor('test', 'http://minglarn.se/ha_sensor.php')
 
     sensor.start_monitor_thread()
 
     while True:
         try:
-            Info('Temp: ', sensor.temp)
+            Info(sensor)
             sleep(1)
         except KeyboardInterrupt:
             sensor.quit()

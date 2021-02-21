@@ -11,6 +11,7 @@ least two of the gpio connections and possibly the relay as well.
 > Python3 (v3.7+)
 
 > Raspberry pi with a seeed relay board: https://wiki.seeedstudio.com/Raspberry_Pi_Relay_Board_v1.0/
+> Documentation: https://seeeddoc.github.io/Raspberry_Pi_Relay_Board_v1.0/
 > and "one wire" temperature sensors type ds18b20
 
 > Seems like raspbian needs some system packages for numpy to run:
