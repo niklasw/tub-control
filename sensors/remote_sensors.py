@@ -11,12 +11,12 @@ from datetime import datetime, timedelta
 
 class Curl_sensor(Configured):
 
-    def __init__(self, name, url):
+    def __init__(self, name, url, period=600):
         self.name = name
         self.url = url
         self.temp = self.err_temp
         self.running = False
-        self.monitor_period=600
+        self.monitor_period=period
         self.stop_threads = False
         self.read()
         self.last_read = datetime.now()

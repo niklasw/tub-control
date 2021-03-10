@@ -39,6 +39,7 @@ def index():
                            set_pump_temp = '{0:d}'.format(control.set_temperatures['pump']),
                            set_pool_temp = '{0:d}'.format(control.set_temperatures['pool']),
                            climate_temp = '{0:0.1f}'.format(control.remote_sensor.temp),
+                           house_temp = '{0:0.1f}'.format(control.house_sensor.temp),
                            timer_status = 'timer_on' \
                                    if control.timer.active else 'timer_off',
                            timer_remain = control.timer.remaining(),
@@ -50,7 +51,7 @@ def index():
 def relay_toggle(action, user):
 
     if user == 'guest':
-        return redirect(url_for('index'))
+        return redirect(url_for('index', _external=True, _scheme='https'))
 
     if action == 'pump':
         control.buttons.pump()
@@ -75,7 +76,7 @@ def relay_toggle(action, user):
     else:
         return "Wrong action error "+action
 
-    return redirect(url_for('index'))
+    return redirect(url_for('index', _external=True, _scheme='https'))
 
 @app.route('/plot/<interval>')
 def plot(interval):

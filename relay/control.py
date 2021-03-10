@@ -21,8 +21,10 @@ class Relay_control(Configured):
         self.timer = Timer()
         self.sensors = TSensors(ds18b20)
         self.remote_sensor = Curl_sensor('Sonat', 'http://minglarn.se/ha_sensor.php')
+        self.house_sensor = Curl_sensor('Inne', 'http://192.168.10.200/temperature/index.php')
         self.sensors.read()
         self.remote_sensor.start_monitor_thread()
+        self.house_sensor.start_monitor_thread()
 
         self.buttons.get_status()
 
@@ -63,6 +65,7 @@ class Relay_control(Configured):
             temps = self.sensors.values
             Debug(self.sensors)
             Debug(self.remote_sensor)
+            Debug(self.house_sensor)
 
             # Do not allow pump to run with hot water
             high_temp = temps['pool'] > 39.0
@@ -88,7 +91,7 @@ class Relay_control(Configured):
             if self.sensors.active:
                 if temps['pump'] < self.set_temperatures['pump']:
                     if not self.buttons.pump_on:
-                        self.timer.set(0,300)
+                        self.timer.set(0,1200)
                 else:
                     if self.buttons.pump_on and not (self.timer.on or self.timer.interval):
                         self.buttons.pump()
@@ -113,6 +116,7 @@ class Relay_control(Configured):
     def quit(self):
        Info('\nStopping control thread')
        self.remote_sensor.quit()
+       self.house_sensor.quit()
        #self.timer.quit()
        #self.sensors.quit()
        self.stop_threads = True
