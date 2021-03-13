@@ -80,7 +80,8 @@ class DbLogger:
             try:
                 self.add_row(row)
                 self.db.commit()
-            except:
+            except sqlite3.ProgrammingError as e:
+                print(e)
                 print('DATABASE could not add row. Might be locked. FIXME.')
 
         #c = self.db.execute('SELECT * FROM "history";')

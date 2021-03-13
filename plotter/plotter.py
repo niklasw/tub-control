@@ -24,9 +24,19 @@ class Plotter:
         self.db = None
         self.table_name = Configured.db_table_name
         self.columns = None
+        self.array_data = None
+
+    def check_db_connection(self):
+        if self.db:
+            try:
+                self.db.execute('PRAGMA user_version')
+                return True
+            except sqlite3.ProgrammingError as e:
+                Debug('plotter.check_db_connection() returns False')
+        return False
 
     def connect(self):
-        if not self.db:
+        if not self.check_db_connection():
             Info('Plotter connects to database')
             db_uri = f'file:///{Configured.database}'
             print(db_uri)
@@ -39,6 +49,7 @@ class Plotter:
                     self.db = None
             else:
                 Warning(f'Could not read db file {db_uri}')
+        return self.db is not None
 
     def quit(self):
         if self.db:
@@ -52,21 +63,26 @@ class Plotter:
         self.end_time = end_time.timestamp()
 
     def get_data(self):
-        self.connect()
-        list_fill = ', '.join(self.columns)
-        sql = f'SELECT time, {list_fill} FROM "{self.table_name}" WHERE time >= {self.start_time} and time <= {self.end_time};'
-        Debug(sql)
-        cursor = self.db.execute(sql)
-        max_points = 500
-        rows = cursor.fetchall()
-        if len(rows) > 2*max_points:
-            n_skip = int(len(rows)/max_points)
-            rows = rows[0::n_skip]
-        return array(rows).transpose()
+        if self.connect():
+            list_fill = ', '.join(self.columns)
+            sql = f'SELECT {list_fill} FROM "{self.table_name}" WHERE time >= {self.start_time} and time <= {self.end_time};'
+            Debug(sql)
+            Info(f'COLUMNS: {self.columns}')
+            cursor = self.db.execute(sql)
+            rows = cursor.fetchall()
+            self.db.close()
+            #max_points = 500
+            #if len(rows) > 2*max_points:
+            #    n_skip = int(len(rows)/max_points)
+            #    rows = rows[0::n_skip]
+            self.array_data = array(rows).transpose()
+        else:
+            self.array_data = array(len(self.columns)*[0])
 
-    def dTdt(self,data,column_name):
+    def ddt(self,column_name):
+        data = self.array_data
         if column_name in self.columns:
-            index = self.columns.index(column_name)+1
+            index = self.columns.index(column_name)
             time = data[0]
             T = data[index]
             dt = diff(time)
@@ -76,13 +92,74 @@ class Plotter:
             return 0*data[0]
 
 
-    def simple_plot(self, data, fig_url):
+    def create_figure(self):
+        fig, (ax1, ax2) = plt.subplots(nrows=2, \
+                                       figsize=(12.96,8), \
+                                       constrained_layout=True)
+ 
+        fig.patch.set_alpha(0.0)
+        ax1.patch.set_alpha(0.0)
+        ax2.patch.set_alpha(0.0)
+        try:
+            data = self.array_data
+            time_span = data[0][-1] - data[0][0]
+            if time_span >= 23*3600:
+                major_locator = mdates.DayLocator()
+                minor_locator = mdates.HourLocator()
+                date_format = mdates.DateFormatter("%Y-%m-%d")
+            elif time_span >= 2*3600:
+                major_locator = mdates.HourLocator()
+                minor_locator = None
+                date_format = mdates.DateFormatter("%H")
+            else:
+                major_locator = mdates.HourLocator()
+                minor_locator = mdates.MinuteLocator()
+                date_format = mdates.DateFormatter("%H:%M")
+
+            ax1.xaxis.set_major_formatter(date_format)
+            ax1.xaxis.set_major_locator(major_locator)
+            if minor_locator:
+                ax1.xaxis.set_minor_locator(minor_locator)
+            ax2.xaxis.set_major_formatter(date_format)
+            ax2.xaxis.set_major_locator(major_locator)
+            if minor_locator:
+                ax2.xaxis.set_minor_locator(minor_locator)
+
+            x_time = [datetime.fromtimestamp(t) for t in data[0]]
+
+            # ax1.set_facecolor('#454545')
+            ax1.tick_params(labelcolor='tab:orange')
+            ax1.plot(x_time, data[1], label=self.columns[1])
+            ax1.plot(x_time, data[2], label=self.columns[2])
+            ax1.plot(x_time, data[3], label=self.columns[3])
+            ax1.plot(x_time, data[4], '--', label=self.columns[4])
+            ax1.plot(x_time, data[5], '--', label=self.columns[5])
+            ax1.grid(True, color='#353535')
+            ax1.legend(fancybox=True, framealpha=0.1, labelcolor='tab:orange')
+
+            #ax2.set_facecolor('#454545')
+            ax2.tick_params(labelcolor='tab:orange')
+            ax2.plot(x_time, data[6], '--', label=self.columns[6], linewidth=2)
+            ax2.plot(x_time, data[7]+0.01, label=self.columns[7])
+            ax2.plot(x_time, data[8]+0.02, label=self.columns[8])
+            ax2.plot(x_time, data[9]+0.03, label=self.columns[9])
+            ax2.set_ylim(-0.1,1.1)
+            ax2.grid(True, color='#353535')
+            ax2.legend(fancybox=True, framealpha=0.1, labelcolor='tab:orange')
+        except:
+            Warning('simple_plot failed')
+
+        self.figure = fig
+
+
+    def simple_plot(self, fig_url):
         fig, (ax1, ax2) = plt.subplots(nrows=2, \
                                        figsize=(12.96,8), \
                                        facecolor='#454545', \
                                        constrained_layout=True)
  
         try:
+            data = self.array_data
             time_span = data[0][-1] - data[0][0]
             if time_span >= 23*3600:
                 major_locator = mdates.DayLocator()

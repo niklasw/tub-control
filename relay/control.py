@@ -29,7 +29,16 @@ class Relay_control(Configured):
         self.buttons.get_status()
 
         self.set_temperatures = {'pool':18, 'pump': 3}
-        Info('Creating Relay_control')
+
+        #self.logger = DbLogger(Path(self.database), \
+        #                       [self.buttons, \
+        #                        self.timer, \
+        #                        self.sensors, \
+        #                        self.remote_sensor, \
+        #                        self.relay, \
+        #                        self])
+
+        Info('Created Relay_control')
         
     def start_timer(self):
         if not self.timer.running:
@@ -48,13 +57,13 @@ class Relay_control(Configured):
         self.thread.start()
 
     def monitor_inputs(self):
-        logger = DbLogger(Path(self.database), \
-                          [self.buttons, \
-                           self.timer, \
-                           self.sensors, \
-                           self.remote_sensor, \
-                           self.relay, \
-                           self])
+        self.logger = DbLogger(Path(self.database), \
+                               [self.sensors, \
+                                self.remote_sensor, \
+                                self, \
+                                self.buttons, \
+                                self.timer, \
+                                self.relay])
 
         while not self.stop_threads:
             time.sleep(0.1)
@@ -72,7 +81,7 @@ class Relay_control(Configured):
             if high_temp:
                 self.buttons.heat_off()
                 self.buttons.pump_off()
-                logger.update()
+                self.logger.update()
                 continue
 
             #if self.timer.active() and not self.heat_on:
@@ -107,11 +116,9 @@ class Relay_control(Configured):
                         self.buttons.heat()
                         Debug('sensor turns OFF heat')
 
-            logger.update()
+            self.logger.update()
             
         Info('Thread monitor_inputs stopped')
-
-                
 
     def quit(self):
        Info('\nStopping control thread')

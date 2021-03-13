@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import redirect, render_template, url_for, request
+from flask import redirect, render_template, url_for, request, Response
 import flaskr
 import os
 from sensors import TSensors, ds18b20
@@ -11,6 +11,8 @@ from flask_socketio import SocketIO, emit
 
 control = relay.init_controls()
 app, htpasswd = flaskr.create_app()
+
+plotter = Plotter(control)
 
 @app.route('/')
 @app.route('/index')
@@ -78,33 +80,31 @@ def relay_toggle(action, user):
 
     return redirect(url_for('index', _external=True, _scheme='https'))
 
+@app.route('/plot.png')
+def plot_png():
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    import io
+    output = io.BytesIO()
+    FigureCanvas(plotter.figure).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
 @app.route('/plot/<interval>')
 def plot(interval):
-    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
     from datetime import datetime
     from numpy import average
 
-    plotter = Plotter(control)
-
-    columns = list(control.sensors.log_data())
-    columns+= list(control.remote_sensor.log_data())
-    columns+= list(control.log_data())
-    columns+= list(control.timer.log_data())
-    columns+= list(control.relay.log_data())
-
-    plotter.columns = columns
+    plotter.columns = control.logger.column_names
     plotter.set_time_range(interval, end_time=datetime.now())
-    data = plotter.get_data()
+    plotter.get_data()
+    data = plotter.array_data
     Info('Plotter data shape =', data.shape)
+    plotter.create_figure()
 
-    img_url = '/static/images/plot.png'
-    plotter.simple_plot(data, img_url)
-
-    plotter.quit()
+    img_url = '/plot.png'
 
     try:
-        dTdt = plotter.dTdt(data, 'pool')
+        dTdt = plotter.ddt('pool')
         if len(dTdt) > 2:
             avg_length = min(10, len(dTdt))
             dTdt = average(dTdt[-avg_length:])
@@ -119,21 +119,11 @@ def plot(interval):
         W = 0
         dTdt = 0
     
-    reload_thing = '?'+str(int(datetime.now().timestamp()))
-
     return render_template('plotter.html', \
                             charge_rate = round(W),
                             deg_per_hour = round(dTdt*3600,1),
-                            image = img_url+reload_thing)
+                            image = img_url)
                             
-
-#def shutdown_server():
-#    func = request.environ.get('werkzeug.server.shutdown')
-#    if func is None:
-#        raise RuntimeError('Not running with the Werkzeug Server')
-#    Warning('Shutting server down')
-#    func()
-
 if __name__ == '__main__':
     print(f'PID: {os.getpid()}')
 
