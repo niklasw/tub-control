@@ -65,10 +65,10 @@ class Timer(Configured):
         else:
             return 0
 
-    def set(self, interval, duration):
+    def set(self, interval, duration, delay_start=0):
         self.active = True if duration > 0 else False
-        self.start_time = datetime.now()
-        self.next_start = self.start_time + timedelta(seconds = self.interval)
+        self.start_time = datetime.now() + timedelta(seconds = delay_start)
+        self.next_start = self.start_time + timedelta(seconds = interval)
         self.interval = interval
         self.duration = duration
         Debug(f'timer set {self.interval}, {self.duration}')

@@ -83,7 +83,7 @@ p.error {
 
 select {
     background-color: #aaaaaa;
-    font-color: #353535;
+    color: #353535;
     border-width:0px;
     border-radius: 10px;
     font-size: 44px;
@@ -91,7 +91,7 @@ select {
 
 input {
     font-size: 44px;
-    font-color: #353535;
+    color: #353535;
     width: 80px;
     background-color: #aaaaaa;
     border-width:0px;
@@ -124,12 +124,20 @@ form label {
     text-align: center;
 }
 
-.timer_on {
+input.timer_on {
     background-color: #ca4020;
 }
 
-.timer_off {
-    background-color: #454545;
+input.timer_off {
+    background-color: #aaaaaa;
+}
+
+select.timer_on {
+    background-color: #ca4020;
+}
+
+select.timer_off {
+    background-color: #aaaaaa;
 }
 
 .toggle {
@@ -153,3 +161,8 @@ form label {
 .button_off {
     background-color: #356D29;
 }
+
+button:hover,input:hover, select:hover {
+    filter: drop-shadow(1px 1px 4px #d3d3d3);
+}
+

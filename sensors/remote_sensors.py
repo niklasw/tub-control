@@ -48,6 +48,7 @@ class Curl_sensor(Configured):
             self.temp = float(data['temp'])
             return data
         except:
+            print(f'\nWARNING: remote_sensor {self.name} could not read.')
             return {}
 
     def start_monitor_thread(self):

@@ -56,13 +56,13 @@ def relay_toggle(action, user):
         return redirect(url_for('index', _external=True, _scheme='https'))
 
     if action == 'pump':
-        control.buttons.pump()
+        control.pump_toggle()
         control.timer.stop()
         control.sensors.active = False
     elif action == 'aux':
         control.buttons.aux()
     elif action == 'heat':
-        control.buttons.heat()
+        control.heat_toggle()
         control.timer.stop()
         control.sensors.active = False
     elif action == 'timer':
@@ -85,6 +85,7 @@ def plot_png():
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     import io
     output = io.BytesIO()
+    plotter.create_figure()
     FigureCanvas(plotter.figure).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
@@ -97,19 +98,12 @@ def plot(interval):
     plotter.columns = control.logger.column_names
     plotter.set_time_range(interval, end_time=datetime.now())
     plotter.get_data()
-    data = plotter.array_data
-    Info('Plotter data shape =', data.shape)
-    plotter.create_figure()
+    Info(f'Plotter data shape = {plotter.array_data.shape}')
 
     img_url = '/plot.png'
 
     try:
         dTdt = plotter.ddt('pool')
-        if len(dTdt) > 2:
-            avg_length = min(10, len(dTdt))
-            dTdt = average(dTdt[-avg_length:])
-        else:
-            dTdt = 0
         pool_volume = 3500
         Cp = 4200
         rho =1.15

@@ -99,23 +99,23 @@
 
     </div>
 
-    <div class="box timer {{timer_status}}" >
-        <form id="timer-control" action="/control/timer" method="post" value="{{interval}}">
+    <div class="box timer" >
+        <form id="timer-control" action="/control/timer" method="post">
             <label for="timer_interval">Int.:</label>
-            <select id="timer_interval" name="timer_interval">
+	    <select class="{{timer_status}}" id="timer_interval" name="timer_interval">
                 {% for key,value in intervals.items() %}
                 <option value="{{key}}" {%if key == interval %} selected {% endif %}>{{value}}</option>
                 {% endfor %}
             </select>
 
             <label for="timer_duration">Tid:</label>
-            <select id="timer_duration" name="timer_duration" value="{{duration}}">
+	    <select class="{{timer_status}}" id="timer_duration" name="timer_duration">
                 {% for key, value in durations.items() %}
                 <option value="{{key}}" {%if key == duration %} selected {% endif %}>{{value}}</option>
                 {% endfor %}
             </select>
 
-            <input type="submit" name="submit" value="OK" />
+	    <input class="{{timer_status}}" type="submit" name="submit" value="OK" />
             <p style="font-size: 12px">Remaining {{timer_remain}}</p>
             <a href="/plot/hours">Plot</a>
         </form>

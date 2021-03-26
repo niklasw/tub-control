@@ -30,14 +30,6 @@ class Relay_control(Configured):
 
         self.set_temperatures = {'pool':18, 'pump': 3}
 
-        #self.logger = DbLogger(Path(self.database), \
-        #                       [self.buttons, \
-        #                        self.timer, \
-        #                        self.sensors, \
-        #                        self.remote_sensor, \
-        #                        self.relay, \
-        #                        self])
-
         Info('Created Relay_control')
         
     def start_timer(self):
@@ -56,6 +48,24 @@ class Relay_control(Configured):
         self.thread.daemon = True
         self.thread.start()
 
+    def hot_pool(self):
+        if self.sensors.values['pool'] > Configured.high_temp:
+            self.buttons.heat_off()
+            self.buttons.pump_off()
+            return True
+        else:
+            return False
+
+    def safe_toggle(self, button):
+        if not self.hot_pool():
+            button()
+
+    def pump_toggle(self):
+        self.safe_toggle(self.buttons.pump)
+
+    def heat_toggle(self):
+        self.safe_toggle(self.buttons.heat)
+
     def monitor_inputs(self):
         self.logger = DbLogger(Path(self.database), \
                                [self.sensors, \
@@ -69,29 +79,28 @@ class Relay_control(Configured):
             time.sleep(0.1)
             self.buttons.get_status()
             self.timer.get_status()
-            Debug(self.timer)
             self.sensors.get_status()
             temps = self.sensors.values
+
+            Debug(self.timer)
             Debug(self.sensors)
             Debug(self.remote_sensor)
             Debug(self.house_sensor)
 
-            # Do not allow pump to run with hot water
-            high_temp = temps['pool'] > 39.0
-            if high_temp:
-                self.buttons.heat_off()
-                self.buttons.pump_off()
+            # Do not allow system to run with hot water
+            if self.hot_pool():
                 self.logger.update()
                 continue
 
             #if self.timer.active() and not self.heat_on:
             if self.timer.active:
+                self.timer.get_status()
                 if self.timer.on:
                     if not self.buttons.pump_on:
-                        self.buttons.pump()
+                        self.pump_toggle()
                         Debug(f'timer turns ON pump {self.timer.duration}')
                 elif self.buttons.pump_on:
-                    self.buttons.pump()
+                    self.pump_toggle()
                     Debug(f'timer turns OFF pump {self.timer.duration}')
                     if not self.timer.interval:
                         self.timer.stop()
@@ -103,17 +112,17 @@ class Relay_control(Configured):
                         self.timer.set(0,1200)
                 else:
                     if self.buttons.pump_on and not (self.timer.on or self.timer.interval):
-                        self.buttons.pump()
+                        self.pump_toggle()
                         self.timer.active = False
                         Debug('sensor turns OFF pump')
 
                 if temps['pool'] < self.set_temperatures['pool']:
                     if not self.buttons.heat_on:
-                        self.buttons.heat()
+                        self.heat_toggle()
                         Debug('sensor turns ON heat')
                 elif temps['pool'] >= self.set_temperatures['pool']+1:
                     if self.buttons.heat_on:
-                        self.buttons.heat()
+                        self.heat_toggle()
                         Debug('sensor turns OFF heat')
 
             self.logger.update()
